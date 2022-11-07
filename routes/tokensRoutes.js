@@ -74,17 +74,52 @@ router.get("/fullTokens", async (req, res) => {
 
 
 router.get("/nextToken", async (req, res) => {
-  console.log(dateDay)
+
   try {
     const fullTokens = await Tokens.find(); //todos tokens
 
-    const ordenados =fullTokens.filter(item=>{ // filtra a senha pelo id em comum e a data do dia
-        return ((item.order ==2) && (item.date==dateDay));
-        //datePattern
-     //   return  (item.date==`"${dateDay}"`);
-      })
-      return res.status(200).json(ordenados);
-  
+    //const senhaAtual= fullTokens.filter(senhadavez=> {senhadavez.priority==='SP'&& senhadavez.date==dateDay})
+   // const senhaAtual= fullTokens.filter(senhadavez=> {if(senhadavez.priority==='SP' && senhadavez.date==dateDay && senhadavez.order == 1) {
+   //   return senhadavez
+
+   // }})
+   // console.log(senhaAtual)
+
+
+
+   //ESTOU FAZENDO A FUNCAO FORA E DEPOIS COLOCANDO NO FILTER
+    const isPrioritySG = fullToken1 => fullToken1.priority === 'SG' && (fullToken1.date==dateDay);
+    const isPrioritySP = fullToken1 => fullToken1.priority === 'SP' && (fullToken1.date==dateDay);
+    const isPrioritySE = fullToken1 => fullToken1.priority === 'SE' && (fullToken1.date==dateDay);
+
+    const senhasSG = fullTokens.filter(isPrioritySG);
+    const senhasSP = fullTokens.filter(isPrioritySP);
+    const senhasSE = fullTokens.filter(isPrioritySE);
+    
+
+    // const ordenados =fullTokens.filter(item=>{ 
+   //     return ((item.order ==2) && (item.date==dateDay));
+      
+   //   })
+ 
+    
+    return res.status(200).json(senhasSP);
+    
+    
+   
+    //console.log(senhasSE);
+
+   // if (senhasSP.order <senhasSE.order && senhasSP<senhasSG){
+    //  return res.status(200).json(senhasSP);
+
+   // }
+
+   // const ordenados =fullTokens.filter(item=>{ // filtra a senha pelo id em comum e a data do dia
+   //     return ((item.order ==2) && (item.date==dateDay));
+      
+   //   })
+      
+   
 
   } catch (e) {
     console.log(e);
@@ -95,10 +130,10 @@ router.get("/nextToken", async (req, res) => {
 
 
 
-router.get("/deleteAll", async (req, res) => {
+router.delete("/deleteAll", async (req, res) => {
   try {
     await Tokens.deleteMany();
-    return res.status(200).json({});
+    return res.status(200).json({"deletados:":"deletados"});
   } catch (e) {
     console.log(e);
   }
