@@ -8,6 +8,7 @@ const priority = require("../models/tokenPriority");
 dateDay = moment().format("DD/MM/YYYY");
 datePattern = moment().format("YYYYMMDD");
 let order = 1;
+let ordertoken = 1;
 let orderSP = 1;
 let orderSG = 1;
 let orderSE = 1;
@@ -72,11 +73,52 @@ router.get("/fullTokens", async (req, res) => {
 
 
 
-
+let contt=1
 router.get("/nextToken", async (req, res) => {
-
+  
   try {
     const fullTokens = await Tokens.find(); //todos tokens
+  
+       //ESTOU FAZENDO A FUNCAO FORA E DEPOIS COLOCANDO NO FILTER
+    const isPrioritySG = fullToken1 => fullToken1.priority === 'SG' && (fullToken1.date==dateDay);
+    const isPrioritySP = fullToken1 => fullToken1.priority === 'SP' && (fullToken1.date==dateDay);
+    const isPrioritySE = fullToken1 => fullToken1.priority === 'SE' && (fullToken1.date==dateDay);
+
+    const senhasSG = fullTokens.filter(isPrioritySG);
+    const senhasSP = fullTokens.filter(isPrioritySP);
+    const senhasSE = fullTokens.filter(isPrioritySE);
+    
+    const senhasTotais= senhasSP.concat(senhasSE).concat(senhasSG)
+
+    const senhaChamada=senhasTotais.find(senhafinal=>senhafinal.order===contt)
+  //  const senhaChamada=senhasTotais.find(senhafinal=>senhafinal.order===undefined?senhafinal.order===3:senhafinal.order===2)
+try{ await senhaChamada.delete();}catch (e) {
+  console.log(e);
+  contt++
+}
+   
+    // const ordenados =fullTokens.filter(item=>{ 
+   //     return ((item.order ==2) && (item.date==dateDay));
+      
+   //   })
+
+
+   // const senhaChamada= fullTokens.find(token=>token.order===ordertoken++)
+   //const senhaChamada= fullTokens.filter(token=>
+   // return if (token.order==1 && token.priority=="SP"){return token}
+    //else if (token.order==1 && token.priority=="SE"){return token} else (token.order==1 && token.priority=="SG"){return token}
+   
+    //  )
+   
+   
+
+/* if (token.order==i && token.priority==SP){return token}
+else if (token.order==i && token.priority==SE){return token} 
+else (token.order==i && token.priority==SG){return token}*/ 
+
+
+
+
 
     //const senhaAtual= fullTokens.filter(senhadavez=> {senhadavez.priority==='SP'&& senhadavez.date==dateDay})
    // const senhaAtual= fullTokens.filter(senhadavez=> {if(senhadavez.priority==='SP' && senhadavez.date==dateDay && senhadavez.order == 1) {
@@ -87,23 +129,10 @@ router.get("/nextToken", async (req, res) => {
 
 
 
-   //ESTOU FAZENDO A FUNCAO FORA E DEPOIS COLOCANDO NO FILTER
-    const isPrioritySG = fullToken1 => fullToken1.priority === 'SG' && (fullToken1.date==dateDay);
-    const isPrioritySP = fullToken1 => fullToken1.priority === 'SP' && (fullToken1.date==dateDay);
-    const isPrioritySE = fullToken1 => fullToken1.priority === 'SE' && (fullToken1.date==dateDay);
 
-    const senhasSG = fullTokens.filter(isPrioritySG);
-    const senhasSP = fullTokens.filter(isPrioritySP);
-    const senhasSE = fullTokens.filter(isPrioritySE);
-    
-
-    // const ordenados =fullTokens.filter(item=>{ 
-   //     return ((item.order ==2) && (item.date==dateDay));
-      
-   //   })
  
     
-    return res.status(200).json(senhasSP);
+    return res.status(200).json(senhaChamada);
     
     
    
