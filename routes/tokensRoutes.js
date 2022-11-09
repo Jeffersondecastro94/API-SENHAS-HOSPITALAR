@@ -4,7 +4,6 @@ const router = require("express").Router();
 const Tokens = require("../models/Tokens");
 const priority = require("../models/tokenPriority");
 
-
 dateDay = moment().format("DD/MM/YYYY");
 datePattern = moment().format("YYYYMMDD");
 let order = 1;
@@ -12,10 +11,13 @@ let ordertoken = 1;
 let orderSP = 1;
 let orderSG = 1;
 let orderSE = 1;
+let contt=1
 
 router.post("/registerToken", async (req, res) => {
-  const { tokenPriority } = req.body;  //UNICO DADO PASSADO PELA REQUISICAO DO POST (A SENHA DESEJADA QUE VAI VIRAR CADASTRO NO BANCO)
 
+  
+  const { tokenPriority } = req.body;  //UNICO DADO PASSADO PELA REQUISICAO DO POST (A SENHA DESEJADA QUE VAI VIRAR CADASTRO NO BANCO)
+  
   if (!tokenPriority) {
     return res.status(422).json({ error: "o campo precisa ser preenchido" });
   }
@@ -26,10 +28,12 @@ router.post("/registerToken", async (req, res) => {
   ) {
     return res.status(406).json({ error: "o Token é invalido" });
   }
+
   try {
+  
     dateDay = moment().format("DD/MM/YYYY");
     datePattern = moment().format("YYYYMMDD");
-
+ 
    //PARA QUE A ORDEM INTERCALE DEPENDENDO DA SENHA SOLICITADA , NAO SEGUINDO UMA ORDEM CRESCENTE UNICA ENTRE TODAS AS SENHAS
     if (tokenPriority=="SE"){
       order=orderSE++  
@@ -42,10 +46,10 @@ router.post("/registerToken", async (req, res) => {
     const token = {
       priority: tokenPriority,
       order: order,
-      // order: order++,
       date: dateDay,
     };
     await Tokens.create(token);
+    contt=1 // REINICIA A ITERACAO NA LISTA QUE TEM TODAS SENHAS A SER CHAMADA
     console.log(`a sua senha é ${datePattern}-${token.priority}${token.order}`);
     return res.status(201).json({
       message: `a sua senha é ${datePattern}-${token.priority}${token.order}`,
@@ -53,7 +57,10 @@ router.post("/registerToken", async (req, res) => {
       priority: tokenPriority,
       order: token.order,
     });
+
+    
   } catch (error) {
+   
     res.status(500).json({ error: error });
   }
 });
@@ -72,11 +79,11 @@ router.get("/fullTokens", async (req, res) => {
 
 
 
+// let contt=1
 
-let contt=1
 router.get("/nextToken", async (req, res) => {
-  
-  try {
+ 
+  try { //TRY PARA O GET
     const fullTokens = await Tokens.find(); //todos tokens
   
        //ESTOU FAZENDO A FUNCAO FORA E DEPOIS COLOCANDO NO FILTER
@@ -91,67 +98,21 @@ router.get("/nextToken", async (req, res) => {
     const senhasTotais= senhasSP.concat(senhasSE).concat(senhasSG)
 
     const senhaChamada=senhasTotais.find(senhafinal=>senhafinal.order===contt)
-  //  const senhaChamada=senhasTotais.find(senhafinal=>senhafinal.order===undefined?senhafinal.order===3:senhafinal.order===2)
-try{ await senhaChamada.delete();}catch (e) {
+
+    
+try{ //se conseguir deletar o numero da ordem setada pelo contador
+  await senhaChamada.delete();} //DELETA A SENHA CHAMADA PARA QUE POSSA CONSULTAR A PROXIMA
+catch (e) { //se nao conseguir deletar o o numero da ordem pois nao existe
   console.log(e);
-  contt++
-}
-   
-    // const ordenados =fullTokens.filter(item=>{ 
-   //     return ((item.order ==2) && (item.date==dateDay));
-      
-   //   })
-
-
-   // const senhaChamada= fullTokens.find(token=>token.order===ordertoken++)
-   //const senhaChamada= fullTokens.filter(token=>
-   // return if (token.order==1 && token.priority=="SP"){return token}
-    //else if (token.order==1 && token.priority=="SE"){return token} else (token.order==1 && token.priority=="SG"){return token}
-   
-    //  )
-   
-   
-
-/* if (token.order==i && token.priority==SP){return token}
-else if (token.order==i && token.priority==SE){return token} 
-else (token.order==i && token.priority==SG){return token}*/ 
-
-
-
-
-
-    //const senhaAtual= fullTokens.filter(senhadavez=> {senhadavez.priority==='SP'&& senhadavez.date==dateDay})
-   // const senhaAtual= fullTokens.filter(senhadavez=> {if(senhadavez.priority==='SP' && senhadavez.date==dateDay && senhadavez.order == 1) {
-   //   return senhadavez
-
-   // }})
-   // console.log(senhaAtual)
-
-
-
-
  
-    
-    return res.status(200).json(senhaChamada);
-    
-    
-   
-    //console.log(senhasSE);
+ contt++
+}
 
-   // if (senhasSP.order <senhasSE.order && senhasSP<senhasSG){
-    //  return res.status(200).json(senhasSP);
+    return res.status(200).json(senhaChamada);// SE O FIND DE SENHASTOTAIS DER CERTO, AI ELE ENTRA NO DELETE, SE NAO, ELE ENTRA NO CATCH DO DELETE, ADCIONANDO +1 NO CONTADOR
 
-   // }
-
-   // const ordenados =fullTokens.filter(item=>{ // filtra a senha pelo id em comum e a data do dia
-   //     return ((item.order ==2) && (item.date==dateDay));
-      
-   //   })
-      
-   
-
-  } catch (e) {
+  } catch (e) {//CASO DE ERRADO A O FIND DO TENKS DA ROTA
     console.log(e);
+   
   }
 });
 
