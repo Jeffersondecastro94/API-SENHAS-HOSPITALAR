@@ -49,7 +49,12 @@ router.post("/registerToken", async (req, res) => {
       date: dateDay,
     };
     await Tokens.create(token);
-    contt=1 // REINICIA A ITERACAO NA LISTA QUE TEM TODAS SENHAS A SER CHAMADA
+  
+    if (token.priority==="SP"){   contt=1 }// REINICIA A ITERACAO NA LISTA QUE TEM TODAS SENHAS A SER CHAMADA}
+   
+
+   
+  
     console.log(`a sua senha é ${datePattern}-${token.priority}${token.order}`);
     return res.status(201).json({
       message: `a sua senha é ${datePattern}-${token.priority}${token.order}`,
