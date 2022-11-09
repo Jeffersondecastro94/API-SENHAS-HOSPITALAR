@@ -122,8 +122,14 @@ catch (e) { //se nao conseguir deletar o o numero da ordem pois nao existe
 
 router.delete("/deleteAll", async (req, res) => {
   try {
+
+    orderSP = 1;
+    orderSG = 1;
+    orderSE = 1;
+
     await Tokens.deleteMany();
     return res.status(200).json({"deletados:":"deletados"});
+  
   } catch (e) {
     console.log(e);
   }
